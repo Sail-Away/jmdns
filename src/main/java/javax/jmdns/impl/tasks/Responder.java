@@ -156,7 +156,8 @@ public class Responder extends DNSTask {
                 // this.cancel();
             } catch (Throwable e) {
                 logger.warn(this.getName() + "run() exception ", e);
-                this.getDns().close();
+                logger.debug("Trying to recover", this.getName());
+                this.getDns().recover();
             }
         }
     }
