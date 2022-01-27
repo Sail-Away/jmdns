@@ -142,9 +142,15 @@ public abstract class DNSStateTask extends DNSTask {
             }
         } catch (Throwable e) {
             logger.warn(this.getName() + ".run() exception ", e);
-            this.recoverTask(e);
+            // only try to recover when DNS remains active
+            if (!this.getDns().isClosing() && !this.getDns().isClosed() && !this.getDns().isCanceling() && !this.getDns().isCanceled()) {
+                logger.warn("{}.run() - trying to recover", this.getName());
+                this.recoverTask(e);
+            }
+            else {
+                logger.warn("{}.run() - DNS already closing/closed/cancelling/cancelled, not recovering", this.getName());
+            }
         }
-
         this.advanceTask();
     }
 

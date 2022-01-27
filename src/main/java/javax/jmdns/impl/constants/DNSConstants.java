@@ -63,4 +63,8 @@ public final class DNSConstants {
 
     public static final int    NETWORK_CHECK_INTERVAL         = 10 * 1000;                                                    // 10 secondes
 
+    // parameters for resend tries in case of network interruptions
+    public static final int    MAX_N_RESEND                   = 10;                                                           // maximum number or resend tries
+    public static final long   WAIT_FOR_RESEND                = 2000L;                                                        // wait 2 seconds until next resend try
+
 }

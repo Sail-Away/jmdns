@@ -1662,7 +1662,32 @@ public class JmDNSImpl extends JmDNS implements DNSStatefulObject, DNSTaskStarte
             }
             final MulticastSocket ms = _socket;
             if (ms != null && !ms.isClosed()) {
-                ms.send(packet);
+                boolean trySend = true;
+                int sendCounter = 0;
+                while (trySend) {
+                    trySend = false;
+                    try {
+                        ms.send(packet);
+                        logger.trace("{}.send() successful", this.getName());
+                    }
+                    catch (IOException e) {
+                        if (sendCounter < DNSConstants.MAX_N_RESEND) {
+                            trySend = true;
+                            sendCounter++;
+                            logger.warn("{}.send() exception, try to resend #{}", this.getName(), sendCounter, e);
+                            try {
+                                Thread.sleep(DNSConstants.WAIT_FOR_RESEND);
+                            }
+                            catch (InterruptedException _ie) {
+                                logger.warn("{}.send() - wait for resend interrupted exception", this.getName(), _ie);
+                            }
+                        }
+                        else {
+                            logger.warn("{}.send() exception, resend finally failed", this.getName(), e);
+                            throw e;
+                        }
+                    }
+                }
             }
         }
     }
